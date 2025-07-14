@@ -40,5 +40,5 @@ if __name__ == '__main__':
 
     if not os.path.exists(os.path.join(args.working_directory, '5_folded_data')):
         os.makedirs(os.path.join(args.working_directory, '5_folded_data'))
-    np.save(os.path.join(args.working_directory, '5_folded_data', 'TE_augmented_x.npy'), arr=folded_train_x)
-    np.save(os.path.join(args.working_directory, '5_folded_data', 'TE_augmented_y.npy'), arr=folded_test_x)
+    np.save(os.path.join(args.working_directory, '5_folded_data', 'train_augmented_folded_x.npy'), arr=folded_train_x)
+    np.save(os.path.join(args.working_directory, '5_folded_data', 'test_augmented_folded_x.npy'), arr=folded_test_x)
