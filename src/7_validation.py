@@ -13,7 +13,7 @@ def norm(a):
     return a_out
 
 # load model
-model_number = 1
+model_number = 2
 model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
 model = tf.keras.models.load_model(model_path)
 
@@ -53,7 +53,7 @@ n_classes = len(classes)
 if not os.path.exists( os.path.join(args.working_directory, '7_validation') ):
     os.makedirs(os.path.join(args.working_directory, '7_validation') ) 
 
-with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report.txt"), "w") as f:
+with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report2.txt"), "w") as f:
     f.write(f"Overall Accuracy: {overall_accuracy:.4f}\n\n")
     # Header
     header = "{:<16}".format(" ") + "".join(["{:>12}".format(c[:10]) for c in classes])
@@ -68,37 +68,3 @@ with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_r
             row += "{:>12}".format(confusion_matrix[i, j])
         row += "{:>17.2f}{:>17.2f}{:>17.2f}".format(sensitivity[i], precision[i], f1_score[i])
         f.write(row + "\n")
-
-#y_pred = y_pred.flatten()
-'''
-print(y_pred.shape)
-
-y_label = y_pred
-print(y_pred[0:100])
-y_label[y_label >= 0.5] = 1
-y_label[y_label< 0.5] = 0
-
-
-print(y_array[y_array == 0].shape[0])
-print(y_array[y_array == 1].shape[0])
-print(y_label.shape[0])
-
-tp = y_label[(y_array == 1) & (y_label == 1)].shape[0]
-fn = y_label[(y_array == 1) & (y_label == 0)].shape[0]
-
-tn = y_label[(y_array == 0) & (y_label == 0)].shape[0]
-fp = y_label[(y_array == 0) & (y_label == 1)].shape[0]
-
-print("                 Prediction                      ")
-print("            --------------------------------------")
-print("           |            Forest    Non-Forest        ")
-print("Validation | Forest     ", tp , "          ", fn , "    ", round(tp/(tp+fn)*100,3) )  
-print("           | Non-Forest   ",fp, "       "  , tn , "    ", round(tn/(fp+tn)*100,3) )
-print("")
-print("                        ", round(tp/(tp+fp)*100,3), "      ", round(tn/(fn+tn)*100,3))
-print('OA = ', round((tp+tn)/(tp+fp+fn+tn)*100,3))
-
-coord_array= np.load(os.path.join(args.working_directory, '3_train_test_data', 'test_coords.npy'))
-combined = np.column_stack((coord_array, y_array, y_label))
-np.savetxt(os.path.join(args.working_directory, '6_validation',"joined_array.txt"), combined, fmt="%.6f %.6f %d %d", header="x y label pred", comments='')
-'''

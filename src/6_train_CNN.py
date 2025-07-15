@@ -77,7 +77,7 @@ def train(model_number):
     lr = 1e-3
     opt = tf.keras.optimizers.Adam(learning_rate=lr)
     train_index = list(range(y_train.shape[0]))
-    epochs = 100
+    epochs = 1000
     batch_size = 64
     iterations = int(y_train.shape[0]/batch_size)
     print(batch_size,iterations)
@@ -106,8 +106,11 @@ def train(model_number):
         with open(os.path.join(args.working_directory, '6_trained_model','version' +str(model_number),'performance.txt'), 'a') as file:
             file.write(f"{e};{np.mean(loss_train)};{lr}\n")
         random.shuffle(train_index)
-        #lr *= params['LEARNING_RATE_DECAY']
-        #opt.learning_raye = lr
+        if e % 100 == 0:
+            print('Save model at epoch: ', e)
+            model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+'_epoch'+ str(e)+'.keras')
+            tf.keras.models.save_model(model, model_path)
+            print('Model is saved at ', model_path)
     if True:
         #model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number))
         model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
@@ -137,4 +140,4 @@ def train(model_number):
     print("Validation accuracy:", acc)
 
 if __name__ == '__main__':
-    train(2)
+    train(3)
