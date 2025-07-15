@@ -86,6 +86,26 @@ def predict(tile, year, model):
         outdata = None
         band=None
         ds=None
+
+    def Export_forest_binary(arr_in):
+        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
+        ds = gdal.Open(path)
+        band = ds.GetRasterBand(1)
+        arr = band.ReadAsArray()
+        [cols, rows] = arr.shape
+        driver = gdal.GetDriverByName("GTiff")
+        path_out = os.path.join(args.working_directory, '8_prediction', tile, 'LC_forest_' + str(year) + '.tif')
+        if os.path.exists(path_out):
+            os.remove(path_out)
+        outdata = driver.Create(path_out, rows, cols, 1, gdal.GDT_Byte)
+        outdata.SetGeoTransform(ds.GetGeoTransform())##sets same geotransform as input
+        outdata.SetProjection(ds.GetProjection())##sets same projection as input
+        outdata.GetRasterBand(1).WriteArray(arr_in)
+        outdata.GetRasterBand(1).SetNoDataValue(-9999)
+        outdata.FlushCache() ##saves to disk!!
+        outdata = None
+        band=None
+        ds=None
     
     blue_band = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
     if not os.path.isfile(blue_band):
@@ -113,10 +133,15 @@ def predict(tile, year, model):
     y_out_clf = np.argmax(y_out, axis= -1)
     y_out_clf += 1
     y_out_clf = y_out_clf.astype(np.int8)
-
     print("Exporting [...] ", datetime.now().strftime('%H:%M:%S'))
     Export(y_out)
     Export_classification(y_out_clf)
+    # forest binary mask
+    forest_binary = y_out_clf
+    forest_binary[forest_binary != 3] = 0 # all other
+    forest_binary[forest_binary == 3] = 1 # Woodland
+    print(forest_binary.shape)
+    Export_forest_binary(forest_binary)
     print('Finished: ', tile, ' ', year , ' ', datetime.now().strftime('%H:%M:%S'))
 
 if __name__ == '__main__':

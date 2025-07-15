@@ -77,7 +77,7 @@ def train(model_number):
     lr = 1e-3
     opt = tf.keras.optimizers.Adam(learning_rate=lr)
     train_index = list(range(y_train.shape[0]))
-    epochs = 50
+    epochs = 100
     batch_size = 64
     iterations = int(y_train.shape[0]/batch_size)
     print(batch_size,iterations)
@@ -137,4 +137,4 @@ def train(model_number):
     print("Validation accuracy:", acc)
 
 if __name__ == '__main__':
-    train(1)
+    train(2)
