@@ -77,16 +77,16 @@ def train(model_number):
     lr = 1e-3
     opt = tf.keras.optimizers.Adam(learning_rate=lr)
     train_index = list(range(y_train.shape[0]))
-    epochs = 25
+    epochs = 50
     batch_size = 64
     iterations = int(y_train.shape[0]/batch_size)
     print(batch_size,iterations)
     random.shuffle(train_index)
 
-    if not os.path.exists( os.path.join(args.working_directory, '5_trained_model', 'version' +str(model_number)) ):
-        os.makedirs(os.path.join(args.working_directory, '5_trained_model', 'version' +str(model_number)) )
+    if not os.path.exists( os.path.join(args.working_directory, '6_trained_model', 'version' +str(model_number)) ):
+        os.makedirs(os.path.join(args.working_directory, '6_trained_model', 'version' +str(model_number)) )
 
-    with open(os.path.join(args.working_directory, '5_trained_model','version' +str(model_number),'performance.txt'), 'w') as file:
+    with open(os.path.join(args.working_directory, '6_trained_model','version' +str(model_number),'performance.txt'), 'w') as file:
         file.write(f" Epoch ; MAE ; LR \n")
 
     #===========================================
@@ -103,14 +103,14 @@ def train(model_number):
         loss_train = loss_train.numpy()
         print('Epoch: ', e)
         print("Mean loss (CCE):", np.mean(loss_train), "Std:", np.std(loss_train))
-        with open(os.path.join(args.working_directory, '5_trained_model','version' +str(model_number),'performance.txt'), 'a') as file:
+        with open(os.path.join(args.working_directory, '6_trained_model','version' +str(model_number),'performance.txt'), 'a') as file:
             file.write(f"{e};{np.mean(loss_train)};{lr}\n")
         random.shuffle(train_index)
         #lr *= params['LEARNING_RATE_DECAY']
         #opt.learning_raye = lr
     if True:
-        #model_path = os.path.join(args.working_directory, '5_trained_model','version' +str(model_number))
-        model_path = os.path.join(args.working_directory, '5_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
+        #model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number))
+        model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
         tf.keras.models.save_model(model, model_path)
         print('Model is saved at ', model_path)
 
@@ -135,7 +135,6 @@ def train(model_number):
     loss, acc = model.evaluate(x_val, y_val)
     print("Validation loss:", loss)
     print("Validation accuracy:", acc)
-
 
 if __name__ == '__main__':
     train(1)

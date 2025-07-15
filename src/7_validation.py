@@ -1,0 +1,104 @@
+import tensorflow as tf
+import numpy as np
+import os
+import argparse
+from sklearn import metrics 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--working_directory", help="path to the working directory", default= "/data/ahsoka/eocp/forestpulse/01_data/02_processed_data/tree_mask_LCC")
+args = parser.parse_args()
+
+def norm(a):
+    a_out = a/10000.
+    return a_out
+
+# load model
+model_number = 1
+model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
+model = tf.keras.models.load_model(model_path)
+
+print('Evaluate model on validation data')
+x_val = np.load(os.path.join(args.working_directory, '5_folded_data', 'test_augmented_folded_x.npy'))
+x_val = norm(x_val)
+y_val= np.load(os.path.join(args.working_directory, '3_train_test_data', 'test_y.npy'))
+indices_vl = y_val - 1
+# One-Hot-Encoding
+y_val = np.eye(8)[indices_vl]
+
+y_pred = model(x_val, training=False)
+y_pred = y_pred.numpy()
+
+validation_classes = np.argmax(y_val, axis=1)
+prediction_classes = np.argmax(y_pred, axis=1)
+
+confusion_matrix = metrics.confusion_matrix(validation_classes, prediction_classes) 
+print(confusion_matrix)
+print('Producers accuracy / Sesitivity:')
+sensitivity = metrics.recall_score(validation_classes, prediction_classes, average=None)
+print(sensitivity)
+print('Users accuracy / Precision:')
+precision = metrics.precision_score(validation_classes, prediction_classes, average=None)
+print(precision)
+print('Overall accuracy:')
+overall_accuracy = metrics.accuracy_score(validation_classes, prediction_classes)
+print(overall_accuracy)
+print('F1 score:')
+f1_score = metrics.f1_score(validation_classes, prediction_classes, average=None)
+print(f1_score)
+
+classes = ['Artificial Land', 'Cropland', 'Woodland', 'Shrubland', 'Grassland', 'Bare Land', 'Water Areas', 'Wetlands']
+n_classes = len(classes)
+# Formatieren und Speichern
+
+if not os.path.exists( os.path.join(args.working_directory, '7_validation') ):
+    os.makedirs(os.path.join(args.working_directory, '7_validation') ) 
+
+with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report.txt"), "w") as f:
+    f.write(f"Overall Accuracy: {overall_accuracy:.4f}\n\n")
+    # Header
+    header = "{:<16}".format(" ") + "".join(["{:>12}".format(c[:10]) for c in classes])
+    header += "{:>17}{:>17}{:>17}".format("Sensitivity/PA", "Precision/UA", "F1-Score")
+    f.write(header + "\n")
+    f.write("-" * len(header) + "\n")
+
+    # Jede Zeile mit Werten
+    for i in range(n_classes):
+        row = "{:<16}".format(classes[i])
+        for j in range(n_classes):
+            row += "{:>12}".format(confusion_matrix[i, j])
+        row += "{:>17.2f}{:>17.2f}{:>17.2f}".format(sensitivity[i], precision[i], f1_score[i])
+        f.write(row + "\n")
+
+#y_pred = y_pred.flatten()
+'''
+print(y_pred.shape)
+
+y_label = y_pred
+print(y_pred[0:100])
+y_label[y_label >= 0.5] = 1
+y_label[y_label< 0.5] = 0
+
+
+print(y_array[y_array == 0].shape[0])
+print(y_array[y_array == 1].shape[0])
+print(y_label.shape[0])
+
+tp = y_label[(y_array == 1) & (y_label == 1)].shape[0]
+fn = y_label[(y_array == 1) & (y_label == 0)].shape[0]
+
+tn = y_label[(y_array == 0) & (y_label == 0)].shape[0]
+fp = y_label[(y_array == 0) & (y_label == 1)].shape[0]
+
+print("                 Prediction                      ")
+print("            --------------------------------------")
+print("           |            Forest    Non-Forest        ")
+print("Validation | Forest     ", tp , "          ", fn , "    ", round(tp/(tp+fn)*100,3) )  
+print("           | Non-Forest   ",fp, "       "  , tn , "    ", round(tn/(fp+tn)*100,3) )
+print("")
+print("                        ", round(tp/(tp+fp)*100,3), "      ", round(tn/(fn+tn)*100,3))
+print('OA = ', round((tp+tn)/(tp+fp+fn+tn)*100,3))
+
+coord_array= np.load(os.path.join(args.working_directory, '3_train_test_data', 'test_coords.npy'))
+combined = np.column_stack((coord_array, y_array, y_label))
+np.savetxt(os.path.join(args.working_directory, '6_validation',"joined_array.txt"), combined, fmt="%.6f %.6f %d %d", header="x y label pred", comments='')
+'''
