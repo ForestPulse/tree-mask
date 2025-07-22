@@ -82,7 +82,8 @@ Y_TILE_RANGE = 34 62
 # be processed.
 # Optional. If NULL, the complete analysis extent is processed
 # Type: full file path
-FILE_TILE = /data/ahsoka/eocp/forestpulse/02_scripts/tree_mask/germany_tiles_sortY.txt
+#FILE_TILE = /data/ahsoka/eocp/forestpulse/02_scripts/tree_mask/germany_tiles_sortY.txt
+FILE_TILE = NULL
 # This parameter can be used to override the default blocksize of the input
 # images (as specified in the datacube-definition.prj file). This can be
 # necessary if the default blocksize is too large for your system and you

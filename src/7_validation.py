@@ -13,8 +13,10 @@ def norm(a):
     return a_out
 
 # load model
-model_number = 2
+model_number = 3
+epoch_number = 900
 model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '.keras')
+#model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(model_number), 'saved_model'+ str(model_number)+ '_epoch'+str(epoch_number)+'.keras')
 model = tf.keras.models.load_model(model_path)
 
 print('Evaluate model on validation data')
@@ -53,7 +55,8 @@ n_classes = len(classes)
 if not os.path.exists( os.path.join(args.working_directory, '7_validation') ):
     os.makedirs(os.path.join(args.working_directory, '7_validation') ) 
 
-with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report2.txt"), "w") as f:
+with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report.txt"), "w") as f:
+#with open(os.path.join(args.working_directory,"7_validation","confusion_matrix_report"+ '_epoch'+str(epoch_number)+".txt"), "w") as f:
     f.write(f"Overall Accuracy: {overall_accuracy:.4f}\n\n")
     # Header
     header = "{:<16}".format(" ") + "".join(["{:>12}".format(c[:10]) for c in classes])
