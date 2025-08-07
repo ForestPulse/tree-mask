@@ -34,8 +34,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build image
-      run: |
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME_LC
+      run: docker build . --file Dockerfile --tag $IMAGE_NAME_LC
 
     - name: Push image
       run: |
