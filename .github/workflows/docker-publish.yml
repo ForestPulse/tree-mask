@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: convert image name to lower case
+      run: echo "IMAGE_NAME_LC=${IMAGE_NAME,,}" >>${GITHUB_ENV}
+
     - name: Checkout source
       uses: actions/checkout@v4
 
@@ -32,8 +35,8 @@ jobs:
 
     - name: Build image
       run: |
-        docker build --file Dockerfile -t $IMAGE_NAME:$VERSION .
+        docker build --file Dockerfile -t $IMAGE_NAME_LC:$VERSION .
 
     - name: Push image
       run: |
-        docker push $IMAGE_NAME:$VERSION
+        docker push $IMAGE_NAME_LC:$VERSION
