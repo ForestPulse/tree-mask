@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: ghcr.io/${{github.repository_owner}}/tree-mask
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/tree-mask
   VERSION: latest
 
 jobs:
@@ -32,8 +32,8 @@ jobs:
 
     - name: Build image
       run: |
-        docker build --file Dockerfile -t $IMAGE_NAME_LC:$VERSION .
+        docker build --file Dockerfile -t $IMAGE_NAME:$VERSION .
 
     - name: Push image
       run: |
-        docker push $IMAGE_NAME_LC:$VERSION
+        docker push $IMAGE_NAME:$VERSION
