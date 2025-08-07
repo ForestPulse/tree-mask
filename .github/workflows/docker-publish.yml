@@ -35,8 +35,9 @@ jobs:
 
     - name: Build image
       run: |
-        docker build --file Dockerfile -t $IMAGE_NAME_LC:$VERSION .
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME_LC
 
     - name: Push image
       run: |
+        docker tag $IMAGE_NAME_LC $IMAGE_NAME_LC:$VERSION
         docker push $IMAGE_NAME_LC:$VERSION
