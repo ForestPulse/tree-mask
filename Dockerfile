@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y python3-pip python3-venv \
 
 # Create and activate virtual environment
 RUN python3 -m venv /venv
-ENV PATH="/venv/bin:/app:$PATH"
+ENV PATH="/venv/bin:/app/src:$PATH"
 
 # Upgrade pip inside the venv and install requirements
 COPY requirements.txt .
@@ -24,4 +24,4 @@ COPY . .
 RUN find . -name "*.py" -exec chmod +x {} \;
 
 # Entry point executes whatever command is passed
-ENTRYPOINT ["/bin/bash", "-c"]
+# ENTRYPOINT ["/bin/bash"]
