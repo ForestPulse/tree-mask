@@ -17,6 +17,7 @@ parser.add_argument("--working_directory", help="path to the working directory",
 parser.add_argument("--year", help="year of the mask", default= "2021")
 parser.add_argument("--tile", help="FORCEtile which should be predicted", default= 'X0055_Y0053')
 parser.add_argument("--name_list", help="names of the landcover classes", default= "['Artificial Land', 'Cropland', 'Woodland', 'Shrubland', 'Grassland', 'Bare Land', 'Water Areas', 'Wetlands']" )
+parser.add_argument("--version", help="version of the model to be used", default = '1')
 #parser.add_argument("--output_directory", help="FORCEtile which should be predicted", default= "/data/ahsoka/eocp/forestpulse/01_data/02_processed_data/tree_mask")
 args = parser.parse_args()
 
@@ -147,7 +148,8 @@ def predict(tile, year, model):
 
 if __name__ == '__main__':
     # load model
-    model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(1), 'saved_model'+ str(1)+ '.keras')
+    version = args.version
+    model_path = os.path.join(args.working_directory, '6_trained_model','version' +str(version), 'saved_model'+ str(version)+ '.keras')
     model = tf.keras.models.load_model(model_path)
     # start prediction
     predict(args.tile, int(args.year) , model)
