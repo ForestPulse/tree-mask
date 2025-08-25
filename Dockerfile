@@ -6,11 +6,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /app
 
 # Install pip and venv
-RUN apt-get update && apt-get install -y python3-pip python3-venv \
+RUN apt-get update && apt-get install -y python3-pip python3-venv python3-gdal \
  && rm -rf /var/lib/apt/lists/*
 
 # Create and activate virtual environment
-RUN python3 -m venv /venv
+RUN python3 -m venv --system-site-packages /venv
 ENV PATH="/venv/bin:/app/src:$PATH"
 
 # Upgrade pip inside the venv and install requirements
