@@ -31,7 +31,7 @@ def get_stack(tile, year):
         band = np.moveaxis(band, 0, -1) 
         return band
     print('Loading Data [...] - ', datetime.now().strftime('%H:%M:%S'))
-    band_list = ['BLU', 'GRN', 'RED', 'RE1', 'RE2', 'RE3', 'BNR', 'NIR', 'SW1', 'SW2']# 10 seconds per band (40 seconds if not in cache)
+    band_list = ['BLUE', 'GREEN', 'RED', 'REDEDGE1', 'REDEDGE2', 'REDEDGE3', 'BROADNIR', 'NIR', 'SWIR1', 'SWIR2']# 10 seconds per band (40 seconds if not in cache)
     stack = np.array([get_band(b) for b in band_list])
     stack = np.moveaxis(stack, 0, -1)
     return stack
@@ -45,7 +45,7 @@ def predict(tile, year, model):
         a_out[a_out<0] = 0
         return a_out
     def Export(arr_in):
-        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
+        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -70,7 +70,7 @@ def predict(tile, year, model):
         ds=None
 
     def Export_classification(arr_in):
-        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
+        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -90,7 +90,7 @@ def predict(tile, year, model):
         ds=None
 
     def Export_forest_binary(arr_in):
-        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
+        path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -109,7 +109,7 @@ def predict(tile, year, model):
         band=None
         ds=None
     
-    blue_band = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
+    blue_band = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
     if not os.path.isfile(blue_band):
         print('Not tile, skipping!')
         return
