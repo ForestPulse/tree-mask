@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--working_directory", help="path to the working directory", default= "/data/ahsoka/eocp/forestpulse/01_data/02_processed_data/tree_mask_LCC")
 parser.add_argument("--year", help="year of the mask", default= "2021")
 parser.add_argument("--tile", help="FORCEtile which should be predicted", default= 'X0055_Y0053')
+parser.add_argument("--mask_dir", help="directory of the germany mask", default= '/data/ahsoka/dc/deu/mask')
+parser.add_argument("--mask_name", help="name of the germany mask file", default= 'DEU.tif')
 parser.add_argument("--name_list", help="names of the landcover classes", default= "['Artificial Land', 'Cropland', 'Woodland', 'Shrubland', 'Grassland', 'Bare Land', 'Water Areas', 'Wetlands']" )
 parser.add_argument("--version", help="version of the model to be used", default = '1')
 #parser.add_argument("--output_directory", help="FORCEtile which should be predicted", default= "/data/ahsoka/eocp/forestpulse/01_data/02_processed_data/tree_mask")
@@ -32,6 +34,7 @@ def get_stack(tile, year):
         return band
     print('Loading Data [...] - ', datetime.now().strftime('%H:%M:%S'))
     band_list = ['BLUE', 'GREEN', 'RED', 'REDEDGE1', 'REDEDGE2', 'REDEDGE3', 'BROADNIR', 'NIR', 'SWIR1', 'SWIR2']# 10 seconds per band (40 seconds if not in cache)
+    #band_list = ['BLU', 'GRN', 'RED', 'RE1', 'RE2', 'RE3', 'BNR', 'NIR', 'SW1', 'SW2']# 10 seconds per band (40 seconds if not in cache)
     stack = np.array([get_band(b) for b in band_list])
     stack = np.moveaxis(stack, 0, -1)
     return stack
@@ -46,6 +49,7 @@ def predict(tile, year, model):
         return a_out
     def Export(arr_in):
         path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
+        #path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -71,6 +75,7 @@ def predict(tile, year, model):
 
     def Export_classification(arr_in):
         path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
+        #path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -91,6 +96,7 @@ def predict(tile, year, model):
 
     def Export_forest_binary(arr_in):
         path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
+        #path = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
         ds = gdal.Open(path)
         band = ds.GetRasterBand(1)
         arr = band.ReadAsArray()
@@ -103,13 +109,14 @@ def predict(tile, year, model):
         outdata.SetGeoTransform(ds.GetGeoTransform())##sets same geotransform as input
         outdata.SetProjection(ds.GetProjection())##sets same projection as input
         outdata.GetRasterBand(1).WriteArray(arr_in)
-        outdata.GetRasterBand(1).SetNoDataValue(-9999)
+        outdata.GetRasterBand(1).SetNoDataValue(255)
         outdata.FlushCache() ##saves to disk!!
         outdata = None
         band=None
         ds=None
     
     blue_band = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLUE_FBW.tif'.format(y1=year, y2=year))
+    #blue_band = os.path.join(args.working_directory, '1_DC_FBW', tile, '{y1}0101-{y2}1231_001-365_HL_TSA_SEN2L_BLU_FBW.tif'.format(y1=year, y2=year))
     if not os.path.isfile(blue_band):
         print('Not tile, skipping!')
         return
@@ -122,7 +129,10 @@ def predict(tile, year, model):
     print('Start: ', tile, ' ', year, ' [...]')
     x_in = get_stack(tile, year)   
     y_out = np.zeros([x_in.shape[0], x_in.shape[1],8])
-    print('Predicting [...] ', datetime.now().strftime('%H:%M:%S'))
+    print('Predicting [...] ', datetime.now().strftime('%H:%M:%S')),
+    with rasterio.open(os.path.join(args.mask_dir, args.tile ,args.mask_name)) as src:
+        germany_mask = src.read(1)
+    print(germany_mask.shape)
     print(x_in.shape)
     print(y_out.shape)
 
@@ -142,6 +152,7 @@ def predict(tile, year, model):
     forest_binary = y_out_clf
     forest_binary[forest_binary != 3] = 0 # all other
     forest_binary[forest_binary == 3] = 1 # Woodland
+    forest_binary[germany_mask == 0] = 255 # outside germany
     print(forest_binary.shape)
     Export_forest_binary(forest_binary)
     print('Finished: ', tile, ' ', year , ' ', datetime.now().strftime('%H:%M:%S'))
