@@ -146,6 +146,7 @@ def predict(tile, year, model):
     y_out_clf += 1
     y_out_clf = y_out_clf.astype(np.uint8)
     y_out_clf[germany_mask == 0] = 255
+    
     print("Exporting [...] ", datetime.now().strftime('%H:%M:%S'))
     Export(y_out)
     Export_classification(y_out_clf)
