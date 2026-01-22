@@ -15,7 +15,7 @@ import ast
 parser = argparse.ArgumentParser()
 parser.add_argument("--working_directory", help="path to the working directory", default= "/data/ahsoka/eocp/forestpulse/01_data/02_processed_data/tree_mask_LCC")
 parser.add_argument("--year", help="year of the mask", default= "2021")
-parser.add_argument("--tile", help="FORCEtile which should be predicted", default= 'X0055_Y0053')
+parser.add_argument("--tile", help="FORCEtile which should be predicted", default= 'X0052_Y0052')
 parser.add_argument("--mask_dir", help="directory of the germany mask", default= '/data/ahsoka/dc/deu/mask')
 parser.add_argument("--mask_name", help="name of the germany mask file", default= 'DEU.tif')
 parser.add_argument("--name_list", help="names of the landcover classes", default= "['Artificial Land', 'Cropland', 'Woodland', 'Shrubland', 'Grassland', 'Bare Land', 'Water Areas', 'Wetlands']" )
@@ -144,7 +144,8 @@ def predict(tile, year, model):
     # classification of dominant species
     y_out_clf = np.argmax(y_out, axis= -1)
     y_out_clf += 1
-    y_out_clf = y_out_clf.astype(np.int8)
+    y_out_clf = y_out_clf.astype(np.uint8)
+    y_out_clf[germany_mask == 0] = 255
     print("Exporting [...] ", datetime.now().strftime('%H:%M:%S'))
     Export(y_out)
     Export_classification(y_out_clf)
